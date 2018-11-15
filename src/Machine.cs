@@ -1,3 +1,4 @@
+using System.IO;
 using DbUp;
 using DbUp.Helpers;
 
@@ -24,6 +25,8 @@ namespace karl_oskar
         {
             if (string.IsNullOrWhiteSpace(dir))
                 return;
+
+            System.Console.WriteLine($"Running scripts from {Path.Join(Directory.GetCurrentDirectory(), dir)}");
 
             var builder = DeployChanges.To
                 .PostgresqlDatabase(_connectionString)
