@@ -11,16 +11,20 @@ namespace karl_oskar
 
             app.HelpOption();
             var optScriptDirectory = app.Option("-dir|--script-directory <DIRECTORY>", "Path to migration script directory", CommandOptionType.SingleValue);
-            optScriptDirectory.IsRequired(true);
+            optScriptDirectory.IsRequired();
             var optionConnectionString = app.Option("-cs|--connectionstring <CONNECTIONSTRING>", "Connection string", CommandOptionType.SingleValue);
-            optionConnectionString.IsRequired(true);
+            optionConnectionString.IsRequired();
+            var optAfterScriptDirectory = app.Option("-after|--after-script-directory <DIRECTORY>", "Path to after script directory", CommandOptionType.SingleValue);
+            var optBeforeScriptDirectory = app.Option("-before|--before-script-directory <DIRECTORY>", "Path to before script directory", CommandOptionType.SingleValue);
 
             app.OnExecute(() =>
             {
-                var dir = optScriptDirectory.HasValue() ? optScriptDirectory.Value() : throw new ArgumentException($"{optScriptDirectory.LongName} is mandatory");
-                var cs = optionConnectionString.HasValue() ? optionConnectionString.Value() : throw new ArgumentException($"{optScriptDirectory.LongName} is mandatory");
+                var dir = optScriptDirectory.Value();
+                var cs = optionConnectionString.Value();
+                var after = optAfterScriptDirectory.Value();
+                var before = optBeforeScriptDirectory.Value();
 
-                var machine = new Machine(cs, dir);
+                var machine = new Machine(cs, dir, after, before);
                 machine.Run();
 
                 return 0;
