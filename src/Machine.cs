@@ -18,61 +18,38 @@ namespace karl_oskar
             _beforeScriptDirectory = before;
         }
 
-        public void Run() 
-        {;
+        private void UpgradeWithoutJournaling(string dir) => Upgrade(dir, true);
 
-            EnsureDatabase.For.PostgresqlDatabase(_connectionString);
+        private void Upgrade(string dir, bool skipJournaling = false)
+        {
+            if (string.IsNullOrWhiteSpace(dir))
+                return;
 
-            if (_beforeScriptDirectory != null)
-            {
-                var upgraderBefore = DeployChanges.To
+            var builder = DeployChanges.To
                 .PostgresqlDatabase(_connectionString)
-                .WithScriptsFromFileSystem(_beforeScriptDirectory)
+                .WithScriptsFromFileSystem(dir)
                 .LogToConsole()
-                .LogScriptOutput()
-                .JournalTo(new NullJournal())
-                .Build();
+                .LogScriptOutput();
 
-                var resultBefore = upgraderBefore.PerformUpgrade();
-
-                if (!resultBefore.Successful)
-                {
-                    throw resultBefore.Error;
-                }
+            if (skipJournaling)
+            {
+                builder.JournalTo(new NullJournal());
             }
 
-            var upgrader =
-                DeployChanges.To
-                .PostgresqlDatabase(_connectionString)
-                .WithScriptsFromFileSystem(_scriptDirectory)
-                .LogToConsole()
-                .LogScriptOutput()
-                .Build();
-
-            var result = upgrader.PerformUpgrade();
+            var result = builder.Build().PerformUpgrade();
 
             if (!result.Successful)
             {
                 throw result.Error;
             }
+        }
 
-            if (_afterScriptDirectory != null)
-            {
-                var upgraderAfter = DeployChanges.To
-                .PostgresqlDatabase(_connectionString)
-                .WithScriptsFromFileSystem(_afterScriptDirectory)
-                .LogToConsole()
-                .LogScriptOutput()
-                .JournalTo(new NullJournal())
-                .Build();
-            
-                var resultAfter = upgraderAfter.PerformUpgrade();
-
-                if (!resultAfter.Successful)
-                {
-                    throw resultAfter.Error;
-                }
-            }
+        public void Run() 
+        {
+            EnsureDatabase.For.PostgresqlDatabase(_connectionString);
+            UpgradeWithoutJournaling(_beforeScriptDirectory);
+            Upgrade(_scriptDirectory);
+            UpgradeWithoutJournaling(_afterScriptDirectory);
         }
     }
 }
