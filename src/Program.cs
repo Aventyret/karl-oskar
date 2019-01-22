@@ -1,5 +1,4 @@
-﻿using System;
-using McMaster.Extensions.CommandLineUtils;
+﻿using McMaster.Extensions.CommandLineUtils;
 
 namespace karl_oskar
 {
@@ -16,6 +15,7 @@ namespace karl_oskar
             optionConnectionString.IsRequired();
             var optAfterScriptDirectory = app.Option("-after|--after-script-directory <DIRECTORY>", "Path to after script directory", CommandOptionType.SingleValue);
             var optBeforeScriptDirectory = app.Option("-before|--before-script-directory <DIRECTORY>", "Path to before script directory", CommandOptionType.SingleValue);
+            var dbTypeDirectory = app.Option("-db|--dbtype <name>", "Choose between sql (SQL Server) or postgresql (PostgreSQL - default)", CommandOptionType.SingleValue);
 
             app.OnExecute(() =>
             {
@@ -23,8 +23,9 @@ namespace karl_oskar
                 var cs = optionConnectionString.Value();
                 var after = optAfterScriptDirectory.Value();
                 var before = optBeforeScriptDirectory.Value();
+                var dbType = DbType.Parse(dbTypeDirectory.Value());
 
-                var machine = new Machine(cs, dir, after, before);
+                var machine = new Machine(cs, dir, after, before, dbType);
                 machine.Run();
 
                 return 0;
@@ -32,5 +33,6 @@ namespace karl_oskar
 
             return app.Execute(args);
         }
+
     }
 }

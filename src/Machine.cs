@@ -1,5 +1,7 @@
+using System;
 using System.IO;
 using DbUp;
+using DbUp.Builder;
 using DbUp.Helpers;
 
 namespace karl_oskar 
@@ -10,13 +12,15 @@ namespace karl_oskar
         private string _scriptDirectory;
         private string _afterScriptDirectory;
         private string _beforeScriptDirectory;
+        private readonly DbType _dbType;
 
-        public Machine(string cs, string dir, string after, string before) 
+        public Machine(string cs, string dir, string after, string before, DbType dbType) 
         {
             _connectionString = cs;
             _scriptDirectory = dir;
             _afterScriptDirectory = after;
             _beforeScriptDirectory = before;
+            _dbType = dbType;
         }
 
         private void UpgradeWithoutJournaling(string dir) => Upgrade(dir, true);
@@ -28,8 +32,7 @@ namespace karl_oskar
 
             System.Console.WriteLine($"Running scripts from {Path.Join(Directory.GetCurrentDirectory(), dir)}");
 
-            var builder = DeployChanges.To
-                .PostgresqlDatabase(_connectionString)
+            var builder = _dbType.GetBuilder(_connectionString)
                 .WithScriptsFromFileSystem(dir)
                 .LogToConsole()
                 .LogScriptOutput();
@@ -49,7 +52,7 @@ namespace karl_oskar
 
         public void Run() 
         {
-            EnsureDatabase.For.PostgresqlDatabase(_connectionString);
+            _dbType.EnsureDb(_connectionString);
             UpgradeWithoutJournaling(_beforeScriptDirectory);
             Upgrade(_scriptDirectory);
             UpgradeWithoutJournaling(_afterScriptDirectory);
