@@ -13,4 +13,5 @@ Options:
   -?|-h|--help                               Show help information
   -dir|--script-directory <DIRECTORY>        Path to migration script directory
   -cs|--connectionstring <CONNECTIONSTRING>  Connection string
+  -db|--dbtype <name>                        Choose between sql (SQL Server) or postgresql (PostgreSQL - default)
 ```
