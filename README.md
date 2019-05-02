@@ -15,3 +15,9 @@ Options:
   -cs|--connectionstring <CONNECTIONSTRING>  Connection string
   -db|--dbtype <name>                        Choose between sql (SQL Server) or postgresql (PostgreSQL - default)
 ```
+
+## Build
+Run `dotnet publish -c Release -r osx.10.11-x64` in the `/src` directory to build the project. 
+
+## Run 
+If you did build according to the previous description, the executable should be found as `/src/bin/Release/netcoreapp2.1/osx.10.11-x64/publish/karl-oskar`. Pro tip is to add `/src/bin/Release/netcoreapp2.1/osx.10.11-x64/publish` to the path to be able to run `karl-oskar` from any location.
